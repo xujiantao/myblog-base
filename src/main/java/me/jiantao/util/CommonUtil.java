@@ -41,4 +41,15 @@ public class CommonUtil {
 		return !mapIsNull(map);
 	}
 	
+	public static boolean arrayIsNull(Object [] objs) {
+		if (objs == null || objs.length == 0) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean arrayIsNotNull(Object [] objs) {
+		return !arrayIsNull(objs);
+	}
+	
 }

@@ -6,7 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import me.jiantao.common.Handle;
+
+import me.jiantao.dao.Handle;
 import me.jiantao.util.DateUtil;
 import me.jiantao.util.StringUtil;
 

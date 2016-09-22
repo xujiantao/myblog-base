@@ -39,8 +39,8 @@ public class ArticleDaoImpl extends BaseDao<Article> implements ArticleDao {
 
 	@Override
 	public Article getArticleById(int id) {
-		Article article=get(Article.class, id);
-		if(article!=null){
+		Article article = get(Article.class, id);
+		if(article != null){
 			article.handle();
 		}
 		return article;

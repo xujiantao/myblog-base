@@ -44,13 +44,12 @@ public class NetUtil {
 	 */
 	public static String sendGet(String url, Map<String, Object> params) {
 		StringBuilder sb = new StringBuilder();
-		if (params != null && params.size() > 0) {
-			for (String key : params.keySet()) {
-				Object value=params.get(key);
-				if(value!=null){
+		if (CommonUtil.mapIsNotNull(params)) {
+			params.forEach((key, value) -> {
+				if(value != null){
 					sb.append(key).append("=").append(value).append("&");
 				}
-			}
+			});
 			String psStr = sb.substring(0, sb.length() - 1);
 			if (url.contains("?")) {
 				url += ("&" + psStr);
@@ -102,20 +101,19 @@ public class NetUtil {
 		post.addHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 		// post请求独有的设置参数方式
 		List<NameValuePair> readParams = new ArrayList<NameValuePair>();
-		if (params != null && params.size() > 0) {
-			for (String key : params.keySet()) {
-				Object value = params.get(key);
-				if(value!=null){
+		if (CommonUtil.mapIsNotNull(params)) {
+			params.forEach((key, value) -> {
+				if(value != null){
 					if (value instanceof Collection) {
 						Collection<?> list = (Collection<?>) value;
-						for (Object object : list) {
-							readParams.add(new BasicNameValuePair(key, object.toString()));
-						}
+						list.forEach(item -> {
+							readParams.add(new BasicNameValuePair(key, item.toString()));
+						});
 					} else {
 						readParams.add(new BasicNameValuePair(key, value.toString()));
 					}
 				}
-			}
+			});
 		}
 		try {
 			// 封装参数

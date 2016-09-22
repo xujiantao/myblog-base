@@ -17,8 +17,7 @@ public interface ArticleDao {
 	
 	public Article getUniqueArticle(String hql, Map<String, Object> params);
 	
-	public PageResult<Article> getArticleByPage(String hql,Map<String, Object> params, PageResult<Article> pr);
+	public PageResult<Article> getArticleByPage(String hql, Map<String, Object> params, PageResult<Article> pr);
 
-	//获取最大的sortCount字段
 	public int getMaxSortCount();
 }

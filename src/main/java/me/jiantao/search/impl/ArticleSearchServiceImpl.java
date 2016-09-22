@@ -75,8 +75,7 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 	}
 
 	@Override
-	public PageResult<Article> getArticleByPage(String keyword,
-			PageResult<Article> pr) throws SolrServerException, IOException {
+	public PageResult<Article> getArticleByPage(String keyword, PageResult<Article> pr){
 		SolrClient client = SolrUtil.getInstance().getArticleClient();
 		SolrQuery query = new SolrQuery(); // 查询对象
 		String queryParam = buildQueryParams(keyword);
@@ -97,7 +96,14 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 		String qf = Constant.INDEX_FIELD_TITLE + "^3 "+ Constant.INDEX_FIELD_LEAD +"^1 " + Constant.INDEX_FIELD_SHOW_CONTENT + " " + Constant.INDEX_FIELD_PINYIN + " " + Constant.INDEX_FIELD_PINYIN_FIRST;
 		query.set("qf", qf);
 		
-		QueryResponse rsp = client.query(query); // 对返回结果的封装
+		QueryResponse rsp;
+		try {
+			rsp = client.query(query);
+		} catch (SolrServerException e) {
+			throw new SearchException(e);
+		} catch (IOException e) {
+			throw new SearchException(e);
+		} // 对返回结果的封装
 		SolrDocumentList docList = rsp.getResults(); // 返回返回的列表
 		pr.setRowsCount(docList.getNumFound()); // 设置总行数
 		List<Article> list = convertHighlight(rsp);
@@ -156,10 +162,10 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 	
 	//处理文章列表
 	private void handleArticle(List<Article> list) {
-		if (list != null && list.size() > 0) {
-			for (Article article : list) {
+		if (CommonUtil.listIsNotNull(list)) {
+			list.forEach(article -> {
 				article.setContent("");
-			}
+			});
 		}
 	}
 	

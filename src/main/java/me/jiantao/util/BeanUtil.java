@@ -11,10 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.Transient;
-
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 
@@ -67,7 +64,7 @@ public class BeanUtil {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Class<?> cla = bean.getClass();
 		Field [] fields = cla.getDeclaredFields();
-		if(fields != null && fields.length > 0){
+		if(CommonUtil.arrayIsNotNull(fields)){
 			for (Field field : fields) {
 				if(!field.isAnnotationPresent(Transient.class)){
 					field.setAccessible(true);
@@ -109,26 +106,25 @@ public class BeanUtil {
 	public static <T>SolrInputDocument BeanToSolrInputDocument(T bean){
 		SolrInputDocument doc = new SolrInputDocument();
 		Map<String, Object> map = BeanToMap(bean);
-		if(map != null && map.size()>0){
-			for (String key : map.keySet()) {
-				Object value = map.get(key);
+		if(CommonUtil.mapIsNotNull(map)){
+			map.forEach((key, value) -> {
 				doc.addField(key, value);
-			}
+			});
 		}
 		return doc;
 	}
 	
 	public static <T>List<T> SolrDocumentListToBeanList(Class<T> cla, SolrDocumentList docList){
 		List<T> list = new ArrayList<>();
-		if(docList != null && docList.size()>0){
-			for (SolrDocument solrDocument : docList) {
-				Collection<String> name = solrDocument.getFieldNames();
+		if(CommonUtil.listIsNotNull(docList)){
+			docList.forEach(doc -> {
+				Collection<String> names = doc.getFieldNames();
 				Map<String, Object> map = new HashMap<>();
-				for (String key : name) {
-					map.put(key, solrDocument.getFieldValue(key));
-				}
+				names.forEach(name -> {
+					map.put(name, doc.getFieldValue(name));
+				});
 				list.add(MapToBean(cla, map));
-			}
+			});
 		}
 		return list;
 	}

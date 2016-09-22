@@ -13,6 +13,8 @@ import org.apache.solr.client.solrj.response.AnalysisResponseBase.AnalysisPhase;
 import org.apache.solr.client.solrj.response.AnalysisResponseBase.TokenInfo;
 import org.apache.solr.client.solrj.response.FieldAnalysisResponse;
 
+import me.jiantao.exception.SearchException;
+
 public class SolrUtil {
 
 	private volatile static SolrUtil solrUtil;
@@ -53,8 +55,7 @@ public class SolrUtil {
 	/**
 	 * 给指定的语句分词。
 	 * 
-	 * @param sentence
-	 *            被分词的语句
+	 * @param sentence 被分词的语句
 	 * @return 分词结果
 	 */
 	public List<String> getAnalysis(String sentence) {
@@ -69,8 +70,7 @@ public class SolrUtil {
 		try {
 			response = request.process(client);
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("获取查询语句的分词时遇到错误");
+			throw new SearchException(e, "获取分词出错");
 		}
 
 		List<String> results = new ArrayList<String>();
@@ -82,13 +82,12 @@ public class SolrUtil {
 			if ("org.apache.lucene.analysis.core.StopFilter".equals(pharse
 					.getClassName())) {
 				List<TokenInfo> list = pharse.getTokens();
-				for (TokenInfo info : list) {
+				list.forEach(info -> {
 					results.add(info.getText());
-				}
+				});
 			}
 
 		}
-
 		return results;
 	}
 

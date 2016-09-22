@@ -3,7 +3,6 @@ package me.jiantao.dao;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -14,6 +13,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 
 import me.jiantao.common.PageResult;
+import me.jiantao.util.CommonUtil;
 /**
  * 公共DAO，提供了一些通用的操作方法
  * @param <T>
@@ -115,13 +115,16 @@ public abstract class BaseDao<T>{
 	@SuppressWarnings("unchecked")
 	protected List<T> list(String hql, Map<String, Object> params) {
 		Query query = getSession().createQuery(hql);
-		if (params != null && params.size() > 0) {
-			Set<String> keys =params.keySet();
-			for (String key : keys) {
-				query.setParameter(key, params.get(key));
-			}
-		}
+		setParamsToQuery(query, params);
 		return (List<T>) query.list();
+	}
+	
+	private void setParamsToQuery(Query query, Map<String, Object> params){
+		if (CommonUtil.mapIsNotNull(params)) {
+			params.forEach((key, value) -> {
+				query.setParameter(key, value);
+			});
+		}
 	}
 
 	/**
@@ -132,12 +135,7 @@ public abstract class BaseDao<T>{
 	 */
 	protected Object uniqueResult(String hql, Map<String, Object> params) {
 		Query query = getSession().createQuery(hql);
-		if (params != null && params.size() > 0) {
-			Set<String> keys =params.keySet();
-			for (String key : keys) {
-				query.setParameter(key, params.get(key));
-			}
-		}
+		setParamsToQuery(query, params);
 		return query.uniqueResult();
 	}
 
@@ -161,11 +159,7 @@ public abstract class BaseDao<T>{
 	 */
 	protected PageResult<T> list(String hql, Map<String, Object> params, PageResult<T> pr) {
 		Query query = getSession().createQuery(hql);
-		if (params != null && params.size() > 0) {
-			for (String key : params.keySet()) {
-				query.setParameter(key, params.get(key));
-			}
-		}
+		setParamsToQuery(query, params);
 		query.setFirstResult((pr.getPageNo() - 1) * pr.getPageSize());
 		query.setMaxResults(pr.getPageSize());
 		pr.setList(list(query));
@@ -227,4 +221,5 @@ public abstract class BaseDao<T>{
 		pr.handle();
 		return pr;
 	}
+	
 }
