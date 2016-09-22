@@ -1,4 +1,4 @@
-package me.jiantao.common;
+package me.jiantao.dao;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,6 +12,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
+
+import me.jiantao.common.PageResult;
 /**
  * 公共DAO，提供了一些通用的操作方法
  * @param <T>

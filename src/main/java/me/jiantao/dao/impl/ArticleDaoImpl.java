@@ -3,9 +3,10 @@ package me.jiantao.dao.impl;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import me.jiantao.common.BaseDao;
+
 import me.jiantao.common.PageResult;
 import me.jiantao.dao.ArticleDao;
+import me.jiantao.dao.BaseDao;
 import me.jiantao.po.Article;
 import me.jiantao.search.IArticleSearchService;
 

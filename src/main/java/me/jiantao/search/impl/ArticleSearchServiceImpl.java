@@ -9,15 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import me.jiantao.common.Constant;
-import me.jiantao.common.PageResult;
-import me.jiantao.po.Article;
-import me.jiantao.search.IArticleSearchService;
-import me.jiantao.util.BeanUtil;
-import me.jiantao.util.CommonUtil;
-import me.jiantao.util.SolrUtil;
-import me.jiantao.util.StringUtil;
-
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -26,6 +17,16 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.stereotype.Service;
+
+import me.jiantao.common.Constant;
+import me.jiantao.common.PageResult;
+import me.jiantao.exception.SearchException;
+import me.jiantao.po.Article;
+import me.jiantao.search.IArticleSearchService;
+import me.jiantao.util.BeanUtil;
+import me.jiantao.util.CommonUtil;
+import me.jiantao.util.SolrUtil;
+import me.jiantao.util.StringUtil;
 
 @Service
 public class ArticleSearchServiceImpl implements IArticleSearchService {
@@ -47,13 +48,10 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 			doc.setField(Constant.INDEX_FIELD_SHOW_CONTENT, showContent);
 			articleClient.add(doc);
 			articleClient.commit();
-			logger.info("添加"+ article.getTitle() +"索引成功");
 		} catch (SolrServerException e) {
-			logger.info("添加"+ article.getTitle() +"索引异常");
-			e.printStackTrace();
+			throw new SearchException(e, "添加索引异常, id: " + article.getId());
 		} catch (IOException e) {
-			logger.info("添加"+ article.getTitle() +"索引异常");
-			e.printStackTrace();
+			throw new SearchException(e, "添加索引异常, id: " + article.getId());
 		}
 	}
 
@@ -69,13 +67,10 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 		try {
 			articleClient.deleteById(id + "");
 			articleClient.commit();
-			logger.info("删除 "+ id +" 索引成功");
 		} catch (SolrServerException e) {
-			logger.info("删除 "+ id +" 索引失败");
-			e.printStackTrace();
+			throw new SearchException(e, "删除索引异常, id: " + id);
 		} catch (IOException e) {
-			logger.info("删除 "+ id +" 索引失败");
-			e.printStackTrace();
+			throw new SearchException(e, "删除索引异常, id: " + id);
 		}
 	}
 
@@ -171,11 +166,10 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 	//为文章列表添加索引
 	@Override
 	public void addAllArticleIndex(List<Article> list) {
-		logger.info("为文章列表添加所有开始");
-		if(list != null && list.size() > 0){
-			for (Article article : list) {
+		if(CommonUtil.listIsNotNull(list)){
+			list.forEach(article -> {
 				saveArticle(article);
-			}
+			});
 		}
 	}
 	
@@ -201,28 +195,24 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 	private List<Article> convertHighlight(QueryResponse rsp){
 		SolrDocumentList docList = rsp.getResults(); // 返回返回的列表
 		Map<String, Map<String, List<String>>> map = rsp.getHighlighting();
-		List<Article> list = BeanUtil.SolrDocumentListToBeanList(Article.class,
-				docList); // 数据转换
+		List<Article> list = BeanUtil.SolrDocumentListToBeanList(Article.class, docList); // 数据转换
 		if(CommonUtil.listIsNotNull(list)){
-			for (Article article : list) {
+			list.forEach(article -> {
 				Map<String, List<String>> newMap = map.get(article.getId().toString());
 				if(CommonUtil.mapIsNotNull(newMap)){
-					for (String name : newMap.keySet()) {
-						if(Constant.INDEX_FIELD_TITLE.equals(name)){
-							List<String> value = newMap.get(name);
+					newMap.forEach((key, value) -> {
+						if(Constant.INDEX_FIELD_TITLE.equals(key)){
 							article.setTitle(value.get(0));
 						}
-						if(Constant.INDEX_FIELD_LEAD.equals(name)){
-							List<String> value = newMap.get(name);
+						if(Constant.INDEX_FIELD_LEAD.equals(key)){
 							article.setLead(value.get(0));
 						}
-						if(Constant.INDEX_FIELD_SHOW_CONTENT.equals(name)){
-							List<String> value = newMap.get(name);
+						if(Constant.INDEX_FIELD_SHOW_CONTENT.equals(key)){
 							article.setShowContent(value.get(0));
 						}
-					}
+					});
 				}
-			}
+			});
 		}
 		return list;
 	}

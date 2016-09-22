@@ -13,6 +13,12 @@ import me.jiantao.util.StringUtil;
 @Entity
 @Table(name = "article")
 public class Article extends BaseEntity<Integer> implements Handle {
+	
+	@Transient
+	public static final int IS_TOP = 1;
+	@Transient
+	public static final int IS_NOT_TOP = 0;
+	
 
 	@Column(name = "title", length = 20, nullable = false)
 	private String title;

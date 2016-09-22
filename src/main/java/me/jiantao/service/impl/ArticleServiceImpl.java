@@ -3,21 +3,17 @@ package me.jiantao.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Resource;
-import me.jiantao.common.Constant;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import me.jiantao.common.PageResult;
 import me.jiantao.dao.ArticleDao;
 import me.jiantao.po.Article;
 import me.jiantao.search.IArticleSearchService;
 import me.jiantao.service.IArticleService;
 import me.jiantao.util.StringUtil;
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Service
 public class ArticleServiceImpl implements IArticleService {
-
-	private static Logger logger = Logger.getLogger(ArticleServiceImpl.class);
 
 	@Resource
 	private ArticleDao articleDao;
@@ -98,9 +94,7 @@ public class ArticleServiceImpl implements IArticleService {
 	public void addAllArticleIndex() {
 		PageResult<Article> pr = new PageResult<>();
 		pr.setPageSize(99999);
-		logger.info("查询所有文章开始");
 		articleDao.getArticleByPage("from Article", null, pr);
-		logger.info("查询所有文章结束");
 		iArticleSearchService.addAllArticleIndex(pr.getList());
 	}
 
@@ -110,49 +104,51 @@ public class ArticleServiceImpl implements IArticleService {
 	}
 
 	@Override
-	public void setTop(int id, int type) {
-
-		Assert.state(type == Constant.CHOOSE_INSTALL
-				  || type == Constant.CHOOSE_CANCEL, "参数异常");
+	public void executeSetTop(int id) {
 		Article article = articleDao.getArticleById(id);
-		Assert.notNull(article, "文章不存在");
-
-		if (type == Constant.CHOOSE_INSTALL) { // 置顶
-			// 取消原先的置顶
-			Map<String, Object> params = new HashMap<>();
-			params.put("isTop", type);
-			Article topArticle = articleDao.getUniqueArticle(
-					"from Article where isTop=:isTop", params);
-			if (topArticle != null) {
-				topArticle.setIsTop(0);
-				articleDao.updateArticle(topArticle);
-			}
-			// 置顶新文章
-			article.setIsTop(1);
-			articleDao.updateArticle(article);
-		} else if (type == Constant.CHOOSE_CANCEL) { // 取消
-			article.setIsTop(0);
-			articleDao.updateArticle(article);
+		checkArticleExists(article);
+		// 取消原先的置顶
+		Map<String, Object> params = new HashMap<>();
+		params.put("isTop", Article.IS_TOP);
+		Article topArticle = articleDao.getUniqueArticle(
+				"from Article where isTop=:isTop", params);
+		if (topArticle != null) {
+			topArticle.setIsTop(Article.IS_NOT_TOP);
+			articleDao.updateArticle(topArticle);
 		}
+		// 置顶新文章
+		article.setIsTop(Article.IS_TOP);
+		articleDao.updateArticle(article);
 	}
 
 	@Override
-	public void recommend(int id, int type) {
-		Assert.state(type == Constant.CHOOSE_INSTALL
-				  || type == Constant.CHOOSE_CANCEL, "参数异常");
-
+	public void cancelSetTop(int id) {
 		Article article = articleDao.getArticleById(id);
-		Assert.notNull(article, "文章不存在");
+		checkArticleExists(article);
+		article.setIsTop(Article.IS_NOT_TOP);
+		articleDao.updateArticle(article);
+	}
 
-		if (type == Constant.CHOOSE_INSTALL) { // 推荐
-			int maxSortCount = articleDao.getMaxSortCount();
-			int sortCount = maxSortCount + 1;
-			article.setSortCount(sortCount);
-			articleDao.updateArticle(article);
-		} else if (type == Constant.CHOOSE_CANCEL) { // 取消
-			article.setSortCount(0);
-			articleDao.updateArticle(article);
-		}
+	@Override
+	public void executeRecommend(int id) {
+		Article article = articleDao.getArticleById(id);
+		checkArticleExists(article);
+		int maxSortCount = articleDao.getMaxSortCount();
+		int sortCount = maxSortCount + 1;
+		article.setSortCount(sortCount);
+		articleDao.updateArticle(article);
+	}
+
+	@Override
+	public void cancelRecommend(int id) {
+		Article article = articleDao.getArticleById(id);
+		checkArticleExists(article);
+		article.setSortCount(0);
+		articleDao.updateArticle(article);
+	}
+	
+	private void checkArticleExists(Article article){
+		Assert.notNull(article, "文章不存在");
 	}
 
 }
