@@ -26,7 +26,6 @@ public class ArticleDaoImpl {
 	private ArticleDao articleDao;
 	
 	@Test
-	@Ignore
 	public void saveArticle(){
 		Article article = new Article();
 		article.setTitle("我是文章标题");
@@ -36,7 +35,6 @@ public class ArticleDaoImpl {
 	};
 	
 	@Test
-	@Ignore
 	public void updateArticle(){
 		Article article = articleDao.getArticleById(id);
 		Assert.assertNotNull(article);
@@ -59,7 +57,6 @@ public class ArticleDaoImpl {
 	};
 	
 	@Test
-	@Ignore
 	public void deleteArticle(){
 		Article article = articleDao.getArticleById(id);
 		Assert.assertNotNull(article);
@@ -69,14 +66,12 @@ public class ArticleDaoImpl {
 	};
 	
 	@Test
-	@Ignore
 	public void getArticleById(){
 		Article article = articleDao.getArticleById(id);
 		Assert.assertNotNull(article);
 	};
 	
 	@Test
-	@Ignore
 	public void getArticleByPage(){
 		PageResult<Article> pr = new PageResult<Article>();
 		String hql = "from Article";

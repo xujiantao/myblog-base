@@ -11,9 +11,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.persistence.Transient;
+
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+
+import me.jiantao.common.AutoConvert;
 
 public class BeanUtil {
 	
@@ -64,9 +68,10 @@ public class BeanUtil {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Class<?> cla = bean.getClass();
 		Field [] fields = cla.getDeclaredFields();
-		if(CommonUtil.arrayIsNotNull(fields)){
+		if(CollectionUtil.isNotEmpty(fields)){
 			for (Field field : fields) {
-				if(!field.isAnnotationPresent(Transient.class)){
+				if(cla.isAnnotationPresent(AutoConvert.class)
+					||field.isAnnotationPresent(AutoConvert.class)){
 					field.setAccessible(true);
 					String key = field.getName();
 					try {
@@ -85,7 +90,8 @@ public class BeanUtil {
 		Field [] superFields = superCla.getDeclaredFields();
 		if(superFields != null && superFields.length > 0){
 			for (Field field : superFields) {
-				if(!field.isAnnotationPresent(Transient.class)){
+				if(cla.isAnnotationPresent(AutoConvert.class)
+						||field.isAnnotationPresent(AutoConvert.class)){
 					field.setAccessible(true);
 					String key = field.getName();
 					try {
@@ -106,7 +112,7 @@ public class BeanUtil {
 	public static <T>SolrInputDocument BeanToSolrInputDocument(T bean){
 		SolrInputDocument doc = new SolrInputDocument();
 		Map<String, Object> map = BeanToMap(bean);
-		if(CommonUtil.mapIsNotNull(map)){
+		if(CollectionUtil.isNotEmpty(map)){
 			map.forEach((key, value) -> {
 				doc.addField(key, value);
 			});
@@ -116,7 +122,7 @@ public class BeanUtil {
 	
 	public static <T>List<T> SolrDocumentListToBeanList(Class<T> cla, SolrDocumentList docList){
 		List<T> list = new ArrayList<>();
-		if(CommonUtil.listIsNotNull(docList)){
+		if(CollectionUtil.isNotEmpty(docList)){
 			docList.forEach(doc -> {
 				Collection<String> names = doc.getFieldNames();
 				Map<String, Object> map = new HashMap<>();

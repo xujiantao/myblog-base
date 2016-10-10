@@ -7,15 +7,12 @@ public class StringUtil {
 	
 	private StringUtil(){};
 	
-	public static boolean IsNull(String text) {
-		if (text == null || text == "") {
-			return true;
-		}
-		return false;
+	public static boolean hasText(String text) {
+		return (text != null && text.trim() != "");
 	}
 
-	public static boolean IsNotNull(String text) {
-		return !IsNull(text);
+	public static boolean hasNoText(String text) {
+		return !hasText(text);
 	}
 	
 	public static String filterHtmlTag(String text){
@@ -37,7 +34,7 @@ public class StringUtil {
 		System.out.println(filterHtmlTag(str));
 	}
 	
-	public static String escape(String text){
+	public static String HtmlEscape(String text){
 		return text.replace("<", "&lt;").replace(">", "&gt;");
 	}
 	

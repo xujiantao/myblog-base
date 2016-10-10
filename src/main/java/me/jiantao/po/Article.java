@@ -2,17 +2,23 @@ package me.jiantao.po;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import me.jiantao.common.AutoConvert;
 import me.jiantao.dao.Handle;
 import me.jiantao.util.DateUtil;
 import me.jiantao.util.StringUtil;
 
 @Entity
 @Table(name = "article")
+@EqualsAndHashCode(callSuper = false)
+@Data
 public class Article extends BaseEntity<Integer> implements Handle {
 	
 	@Transient
@@ -20,26 +26,32 @@ public class Article extends BaseEntity<Integer> implements Handle {
 	@Transient
 	public static final int IS_NOT_TOP = 0;
 	
-
 	@Column(name = "title", length = 20, nullable = false)
+	@AutoConvert
 	private String title;
 
 	@Column(name = "lead", length = 200)
+	@AutoConvert
 	private String lead;
 
 	@Column(name = "content", length = 20000, nullable = false)
+	@AutoConvert
 	private String content;
 
 	@Column(name = "tags")
+	@AutoConvert
 	private String tags;
 
 	@Column(name = "visit_count")
+	@AutoConvert
 	private int visitCount = 0;
 
 	@Column(name = "sort_count")
+	@AutoConvert
 	private int sortCount = 0;
 
-	@Column(name = "is_top", columnDefinition = "default 0")
+	@Column(name = "is_top")
+	@AutoConvert
 	private int isTop = 0;
 
 	@Transient
@@ -52,102 +64,6 @@ public class Article extends BaseEntity<Integer> implements Handle {
 	private String showCreateDate;
 	@Transient
 	private String showContent;
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getTags() {
-		return tags;
-	}
-
-	public void setTags(String tags) {
-		this.tags = tags;
-	}
-
-	public int getVisitCount() {
-		return visitCount;
-	}
-
-	public void setVisitCount(int visitCount) {
-		this.visitCount = visitCount;
-	}
-
-	public long getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(long startDate) {
-		this.startDate = startDate;
-	}
-
-	public long getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(long endDate) {
-		this.endDate = endDate;
-	}
-
-	public List<String> getTagList() {
-		return tagList;
-	}
-
-	public void setTagList(List<String> tagList) {
-		this.tagList = tagList;
-	}
-
-	public String getShowCreateDate() {
-		return showCreateDate;
-	}
-
-	public void setShowCreateDate(String showCreateDate) {
-		this.showCreateDate = showCreateDate;
-	}
-
-	public String getLead() {
-		return lead;
-	}
-
-	public void setLead(String lead) {
-		this.lead = lead;
-	}
-
-	public int getSortCount() {
-		return sortCount;
-	}
-
-	public void setSortCount(int sortCount) {
-		this.sortCount = sortCount;
-	}
-
-	public int getIsTop() {
-		return isTop;
-	}
-
-	public void setIsTop(int isTop) {
-		this.isTop = isTop;
-	}
-
-	public String getShowContent() {
-		return showContent;
-	}
-
-	public void setShowContent(String showContent) {
-		this.showContent = showContent;
-	}
 
 	@Override
 	public String toString() {
@@ -164,7 +80,7 @@ public class Article extends BaseEntity<Integer> implements Handle {
 	}
 
 	public void handle() {
-		if (StringUtil.IsNotNull(tags)) {
+		if (StringUtil.hasText(tags)) {
 			String[] arrTag = tags.split(",");
 			if (arrTag != null) {
 				List<String> tagList = new ArrayList<String>();

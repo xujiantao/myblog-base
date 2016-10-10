@@ -24,7 +24,7 @@ import me.jiantao.exception.SearchException;
 import me.jiantao.po.Article;
 import me.jiantao.search.IArticleSearchService;
 import me.jiantao.util.BeanUtil;
-import me.jiantao.util.CommonUtil;
+import me.jiantao.util.CollectionUtil;
 import me.jiantao.util.SolrUtil;
 import me.jiantao.util.StringUtil;
 
@@ -162,7 +162,7 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 	
 	//处理文章列表
 	private void handleArticle(List<Article> list) {
-		if (CommonUtil.listIsNotNull(list)) {
+		if (CollectionUtil.isNotEmpty(list)) {
 			list.forEach(article -> {
 				article.setContent("");
 			});
@@ -172,7 +172,7 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 	//为文章列表添加索引
 	@Override
 	public void addAllArticleIndex(List<Article> list) {
-		if(CommonUtil.listIsNotNull(list)){
+		if(CollectionUtil.isNotEmpty(list)){
 			list.forEach(article -> {
 				saveArticle(article);
 			});
@@ -202,10 +202,10 @@ public class ArticleSearchServiceImpl implements IArticleSearchService {
 		SolrDocumentList docList = rsp.getResults(); // 返回返回的列表
 		Map<String, Map<String, List<String>>> map = rsp.getHighlighting();
 		List<Article> list = BeanUtil.SolrDocumentListToBeanList(Article.class, docList); // 数据转换
-		if(CommonUtil.listIsNotNull(list)){
+		if(CollectionUtil.isNotEmpty(list)){
 			list.forEach(article -> {
 				Map<String, List<String>> newMap = map.get(article.getId().toString());
-				if(CommonUtil.mapIsNotNull(newMap)){
+				if(CollectionUtil.isNotEmpty(newMap)){
 					newMap.forEach((key, value) -> {
 						if(Constant.INDEX_FIELD_TITLE.equals(key)){
 							article.setTitle(value.get(0));

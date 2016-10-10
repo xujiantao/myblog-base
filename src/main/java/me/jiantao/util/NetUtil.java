@@ -2,17 +2,13 @@ package me.jiantao.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -44,7 +40,7 @@ public class NetUtil {
 	 */
 	public static String sendGet(String url, Map<String, Object> params) {
 		StringBuilder sb = new StringBuilder();
-		if (CommonUtil.mapIsNotNull(params)) {
+		if (CollectionUtil.isEmpty(params)) {
 			params.forEach((key, value) -> {
 				if(value != null){
 					sb.append(key).append("=").append(value).append("&");
@@ -70,12 +66,8 @@ public class NetUtil {
 			// 将相应的内容转化为字符串的形式
 			String result = EntityUtils.toString(entity);
 			return result;
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException("发送get请求失败");
 		} finally {
 			try {
 				client.close();
@@ -83,7 +75,6 @@ public class NetUtil {
 				e.printStackTrace();
 			}
 		}
-		return null;
 	}
 
 	/**
@@ -101,7 +92,7 @@ public class NetUtil {
 		post.addHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 		// post请求独有的设置参数方式
 		List<NameValuePair> readParams = new ArrayList<NameValuePair>();
-		if (CommonUtil.mapIsNotNull(params)) {
+		if (CollectionUtil.isEmpty(params)) {
 			params.forEach((key, value) -> {
 				if(value != null){
 					if (value instanceof Collection) {
@@ -125,14 +116,8 @@ public class NetUtil {
 			HttpEntity entity = resp.getEntity();
 			String result = EntityUtils.toString(entity);
 			return result;
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException("发送post请求失败");
 		} finally {
 			try {
 				client.close();
@@ -140,7 +125,6 @@ public class NetUtil {
 				e.printStackTrace();
 			}
 		}
-		return null;
 	}
 
 	/**
@@ -176,17 +160,14 @@ public class NetUtil {
 			} finally {
 				response.close();
 			}
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
+		} catch (Exception e) {
+			throw new RuntimeException("上传请求失败");
+		}finally {
 			try {
 				httpclient.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		return null;
 	}
 }

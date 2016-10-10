@@ -13,7 +13,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 
 import me.jiantao.common.PageResult;
-import me.jiantao.util.CommonUtil;
+import me.jiantao.util.CollectionUtil;
 /**
  * 公共DAO，提供了一些通用的操作方法
  * @param <T>
@@ -120,7 +120,7 @@ public abstract class BaseDao<T>{
 	}
 	
 	private void setParamsToQuery(Query query, Map<String, Object> params){
-		if (CommonUtil.mapIsNotNull(params)) {
+		if (CollectionUtil.isNotEmpty(params)) {
 			params.forEach((key, value) -> {
 				query.setParameter(key, value);
 			});

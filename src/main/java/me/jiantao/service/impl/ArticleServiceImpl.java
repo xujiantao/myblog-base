@@ -26,7 +26,6 @@ public class ArticleServiceImpl implements IArticleService {
 		Assert.notNull(article, "参数不能为null");
 		Assert.hasText(article.getTitle(), "文章标题为空");
 		Assert.hasText(article.getContent(), "文章内容为空");
-		
 		article.setCreateDate(System.currentTimeMillis());
 		return articleDao.saveArticle(article);
 	}
@@ -67,7 +66,7 @@ public class ArticleServiceImpl implements IArticleService {
 		Map<String, Object> params = new HashMap<String, Object>();
 		if (article != null) {
 			hql.append(" where");
-			if (StringUtil.IsNotNull(article.getTitle())) {
+			if (StringUtil.hasNoText(article.getTitle())) {
 				hql.append(" title like :title");
 				params.put("title", "%" + article.getTitle() + "%");
 			}

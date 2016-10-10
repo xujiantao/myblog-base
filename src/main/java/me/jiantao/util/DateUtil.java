@@ -37,9 +37,8 @@ public class DateUtil {
 		try {
 			return format.parse(source);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			throw new RuntimeException("时间转换异常", e);
 		}
-		return null;
 	}
 	
 	public static Date StringToDate(String source) {

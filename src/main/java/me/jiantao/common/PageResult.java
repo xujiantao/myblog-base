@@ -3,7 +3,7 @@ package me.jiantao.common;
 import java.util.List;
 
 import me.jiantao.dao.Handle;
-import me.jiantao.util.CommonUtil;
+import me.jiantao.util.CollectionUtil;
 /**
  * 分页对象，可以根据此对象设置查询条件，
  * 然后后端查询结束之后，直接在根据此对象
@@ -160,7 +160,7 @@ public class PageResult<T> {
 		setHasPrev();
 		setNextPageNo();
 		setPrevPageNo();
-		if(CommonUtil.listIsNotNull(list)){
+		if(CollectionUtil.isNotEmpty(list)){
 			T t = list.get(0);
 			if(t instanceof Handle){
 				list.forEach(nt -> {

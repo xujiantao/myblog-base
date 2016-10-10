@@ -6,31 +6,21 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import lombok.Data;
+import me.jiantao.common.AutoConvert;
+
 @MappedSuperclass
+@Data
 public class BaseEntity<ID> {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false, unique = true)
+	@AutoConvert
 	protected ID id;
 
 	@Column(updatable = false, name = "create_date", nullable=false)
+	@AutoConvert
 	protected long createDate;
-
-	public ID getId() {
-		return id;
-	}
-
-	public void setId(ID id) {
-		this.id = id;
-	}
-
-	public Long getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Long createDate) {
-		this.createDate = createDate;
-	}
 
 }
